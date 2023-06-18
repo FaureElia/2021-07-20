@@ -5,9 +5,13 @@
 package it.polito.tdp.yelp;
 
 import java.net.URL;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import it.polito.tdp.yelp.model.Model;
+import it.polito.tdp.yelp.model.User;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -38,13 +42,13 @@ public class FXMLController {
     private TextField txtX2; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbAnno"
-    private ComboBox<?> cmbAnno; // Value injected by FXMLLoader
+    private ComboBox<Integer> cmbAnno; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtN"
     private TextField txtN; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbUtente"
-    private ComboBox<?> cmbUtente; // Value injected by FXMLLoader
+    private ComboBox<User> cmbUtente; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtX1"
     private TextField txtX1; // Value injected by FXMLLoader
@@ -54,16 +58,46 @@ public class FXMLController {
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
+    	Integer anno=this.cmbAnno.getValue();
+    	String nS=this.txtN.getText();
+    	if(anno==null || nS=="") {
+    		return;	
+    	}
+    	try {
+    		int n=Integer.parseInt(nS);
+    		Set<User> users=this.model.creaGrafo(anno, n);
+    		this.cmbUtente.getItems().addAll(users);
+    		this.txtResult.setText("stop");
+    	}catch(NumberFormatException e) {
+    		return;
+    	}
 
     }
 
     @FXML
     void doUtenteSimile(ActionEvent event) {
+    	User user=this.cmbUtente.getValue();
+    	if(this.cmbUtente==null) {
+    		return;
+    	}
+    	this.model.getSimile(user);
+    	System.out.println(this.model.getPiuSimili());
+    	System.out.println(this.model.getGrado());
 
     }
     
     @FXML
     void doSimula(ActionEvent event) {
+    	String x1S=this.txtX1.getText();
+    	String x2S=this.txtX2.getText();
+    	try {
+    		int x1=Integer.parseInt(x1S);
+    		int x2=Integer.parseInt(x2S);
+    		
+    		this.model.simula(x1,x2);
+    	}catch(NumberFormatException e) {
+    	}
+    	
 
     }
     
@@ -84,5 +118,10 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	List<Integer> listaAnni=new LinkedList<>();
+    	for(int i=2003; i<2014;i++) {
+    		listaAnni.add(i);
+    	}
+    	this.cmbAnno.getItems().addAll(listaAnni);
     }
 }
